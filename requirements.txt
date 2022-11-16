@@ -2,7 +2,7 @@ beautifulsoup4==4.11.1
 ipykernel==6.15.1
 ipython==8.4.0
 lightgbm==3.3.2
-mamba==0.25.0
+mamba
 matplotlib==3.5.2
 numpy==1.23.1
 optuna==2.10.1
