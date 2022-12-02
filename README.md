@@ -14,5 +14,6 @@ This material is an introduction to using machine-learning for portfolio managem
 
     pip install -r requirements.txt
     pip install -e . 
+    python -m ipykernel install --user --name ml4pmt --display-name "Python (ml4pmt)"
     
     ```
