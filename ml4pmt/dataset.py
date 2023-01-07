@@ -11,7 +11,7 @@ import re
 from bs4 import BeautifulSoup
 from tqdm.auto import tqdm
 import gdown
-
+import subprocess
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -385,3 +385,70 @@ def load_loughran_mcdonald_dictionary(cache_dir=None, force_reload=False, quiet=
         gdown.download(url, output, quiet=quiet, fuzzy=True)
         
     return pd.read_csv(filename)
+
+
+
+mapping_10X =   {'AAPL': ['APPLE COMPUTER INC', 'APPLE INC'],
+             'AIG': 'AMERICAN INTERNATIONAL GROUP INC',
+             'AMZN': 'AMAZON COM INC',
+             'AXP': 'AMERICAN EXPRESS CO',
+             'BA': 'BOEING CO',
+             'BAC': 'BANK OF AMERICA CORP /DE/',
+             'CAT': 'CATERPILLAR INC',
+             'CL': 'COLGATE PALMOLIVE CO',
+             'CMCSA': 'COMCAST CORP',
+             'COP': 'CONOCOPHILLIPS',
+             'CSCO': 'CISCO SYSTEMS INC',
+             'CVC': 'CABLEVISION SYSTEMS CORP /NY',
+             'CVS': ['CVS CORP', 'CVS/CAREMARK CORP', 'CVS CAREMARK CORP'],
+             'CVX': ['CHEVRONTEXACO CORP', 'CHEVRON CORP'],
+             'DD': 'DUPONT E I DE NEMOURS & CO',
+             'DELL': ['DELL COMPUTER CORP', 'DELL INC'],
+             'F': 'FORD MOTOR CO',
+             'GD': 'GENERAL DYNAMICS CORP',
+             'GE': 'GENERAL ELECTRIC CO',
+             'GS': 'GOLDMAN SACHS GROUP INC/',
+             'HD': 'HOME DEPOT INC',
+             'HPQ': 'HEWLETT PACKARD CO',
+             'IBM': 'INTERNATIONAL BUSINESS MACHINES CORP',
+             'JPM': 'J P MORGAN CHASE & CO',
+             'K': 'KELLOGG CO',
+             'KMB': 'KIMBERLY CLARK CORP',
+             'KO': 'COCA COLA CO',
+             'MAR': 'MARRIOTT INTERNATIONAL INC /MD/',
+             'MCD': 'MCDONALDS CORP',
+             'MMM': '3M CO',
+             'MSFT': 'MICROSOFT CORP',
+             'NAV': 'NAVISTAR INTERNATIONAL CORP',
+             'NOC': 'NORTHROP GRUMMAN CORP /DE/',
+             'PEP': 'PEPSI BOTTLING GROUP INC',
+             'PFE': 'PFIZER INC',
+             'PG': 'PROCTER & GAMBLE CO',
+             'R': 'RYDER SYSTEM INC',
+             'RTN': 'RAYTHEON CO/',
+             'TWX': ['AOL TIME WARNER INC', 'TIME WARNER INC'],
+             'TXN': 'TEXAS INSTRUMENTS INC',
+             'VLO': 'VALERO ENERGY CORP/TX',
+             'WFC': 'WELLS FARGO & CO/MN',
+             'WMT': 'WAL MART STORES INC',
+             'XOM': 'EXXON MOBIL CORP',
+             'XRX': 'XEROX CORP',
+             'YHOO': 'YAHOO INC'}
+
+def load_10X_summaries(cache_dir=None, force_reload=False):
+    if cache_dir is None:
+        cache_dir = Path(os.getcwd()) / "data"
+    if isinstance(cache_dir, str):
+        cache_dir = Path(cache_dir)
+
+    filename = cache_dir / 'Loughran-McDonald_10X_Summaries_1993-2021.csv'
+
+    if (filename.is_file()) & (~force_reload):
+        logger.info(f"logging from cache directory: {filename}")
+    else:
+        logger.info("loading from external source")
+        url = 'https://docs.google.com/uc?export=download&confirm=t&id=1CUzLRwQSZ4aUTfPB9EkRtZ48gPwbCOHA'        
+        subprocess.run(f"wget -O '{filename}' '{url}'", shell=True, capture_output=True);
+        
+    df = pd.read_csv(filename).assign(date = lambda x: pd.to_datetime(x.FILING_DATE, format='%Y%m%d'))
+    return df
